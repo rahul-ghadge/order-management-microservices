@@ -16,21 +16,21 @@
                         │           API GATEWAY  :8080             │
                         │  JWT validation · Rate limiting · CORS   │
                         │  Spring Cloud Gateway + Redis            │
-                        └──┬──────────┬──────────┬──────────┬──────┘
-                           │          │          │          │
-               ┌───────────▼──┐ ┌─────▼─────┐ ┌──▼──────┐ ┌─▼─────────────┐
-               │ user-service │ │order-svc  │ │pay-svc  │ │notif-svc      │
-               │    :8081     │ │  :8082    │ │ :8083   │ │    :8084      │
-               │ JWT issuance │ │ Order     │ │Payment  │ │Email dispatch │
-               │ Redis cache  │ │ Kafka pub │ │Kafka pub│ │Kafka consumer │
-               └──────┬───────┘ └────┬──────┘ └──┬──────┘ └───────────────┘
-                      │              │           │
-               ┌──────▼──────┐ ┌─────▼─────┐ ┌───▼───────┐
-               │ PostgreSQL  │ │PostgreSQL │ │PostgreSQL │
-               │  user_db    │ │ order_db  │ │payment_db │
-               └─────────────┘ └─────┬─────┘ └───────────┘
-                                     │
-                        ┌────────────▼───────────────────┐
+                        └──────┬──────────┬──────────┬──────────┬──┘
+                               │          │          │          │
+                   ┌───────────▼──┐ ┌─────▼─────┐ ┌──▼──────┐ ┌─▼─────────────┐
+                   │ user-service │ │order-svc  │ │pay-svc  │ │notif-svc      │
+                   │    :8081     │ │  :8082    │ │ :8083   │ │    :8084      │
+                   │ JWT issuance │ │ Order     │ │Payment  │ │Email dispatch │
+                   │ Redis cache  │ │ Kafka pub │ │Kafka pub│ │Kafka consumer │
+                   └──────┬───────┘ └────┬──────┘ └──┬──────┘ └───────────────┘
+                          │              │           │
+                   ┌──────▼──────┐ ┌─────▼─────┐ ┌───▼───────┐
+                   │ PostgreSQL  │ │PostgreSQL │ │PostgreSQL │
+                   │  user_db    │ │ order_db  │ │payment_db │
+                   └─────────────┘ └─────┬─────┘ └───────────┘
+                                         │
+                        ┌────────────────▼───────────────┐
                         │         Apache Kafka           │
                         │  order.placed                  │
                         │  payment.processed             │
