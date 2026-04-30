@@ -41,7 +41,7 @@
         <spring-cloud.version>2024.0.1</spring-cloud.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <lombok.version>1.18.32</lombok.version>
-        <springdoc.version>2.5.0</springdoc.version>
+        <springdoc.version>2.8.6</springdoc.version>
         <jjwt.version>0.12.6</jjwt.version>
         <testcontainers.version>1.19.8</testcontainers.version>
     </properties>
