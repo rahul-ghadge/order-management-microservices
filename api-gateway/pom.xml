@@ -5,12 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.orderms</groupId>
-        <artifactId>spring-boot-order-management-microservices</artifactId>
+        <artifactId>order-management-microservices</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>api-gateway</artifactId>
     <name>api-gateway</name>
-    <description>Spring Cloud Gateway – single entry point with JWT validation, rate limiting, CORS, circuit breaking. Port 8080.</description>
+    <description>Spring Cloud Gateway – single entry point with JWT validation, rate limiting, CORS, circuit breaking.
+        Port 8080.
+    </description>
 
     <dependencies>
         <dependency>
@@ -26,13 +28,16 @@
             <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.jsonwebtoken</groupId><artifactId>jjwt-api</artifactId>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.jsonwebtoken</groupId><artifactId>jjwt-impl</artifactId>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.jsonwebtoken</groupId><artifactId>jjwt-jackson</artifactId>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
         </dependency>
         <dependency>
             <groupId>io.micrometer</groupId>
@@ -49,5 +54,12 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <build><plugins><plugin><groupId>org.springframework.boot</groupId><artifactId>spring-boot-maven-plugin</artifactId></plugin></plugins></build>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>

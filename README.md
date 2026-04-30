@@ -1,7 +1,7 @@
 # 🏗️ Spring Boot Order Management System — Microservices Architecture
 
-> **Senior / Architect-level portfolio project** demonstrating production-ready microservices
-> with event-driven communication, distributed security, observability, and containerisation.
+> Demonstrating production-ready microservices
+> with event-driven communication, distributed security, observability, and containerization.
 
 ---
 
@@ -65,7 +65,7 @@
 ## 📦 Module Structure
 
 ```
-spring-boot-order-management-microservices/
+order-management-microservices/
 │
 ├── common-lib/                    # Shared library (NOT a Spring Boot app)
 │   └── src/main/java/com/orderms/common/
@@ -176,11 +176,11 @@ order-service  ──[order.placed]───────────────
 | Maven | 3.9 |
 | Docker + Docker Compose | 24 |
 
-### One-command startup
+## 🚀 One-command startup 🚀- just run one command and all sevices will be up and running which can be verified on Docker Desktop
 
 ```bash
-git clone https://github.com/rahul-ghadge/spring-boot-order-management-microservices.git
-cd spring-boot-order-management-microservices
+git clone https://github.com/rahul-ghadge/order-management-microservices.git
+cd order-management-microservices
 chmod +x scripts/start-dev.sh
 ./scripts/start-dev.sh
 ```
