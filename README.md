@@ -401,3 +401,17 @@ mvn test jacoco:report
 ## 📝 License
 
 Apache 2.0 — see [LICENSE](LICENSE).
+
+
+
+
+<img width="1016" height="384" alt="image" src="https://github.com/user-attachments/assets/fe935658-a8cb-405a-bb89-919e3ceffd7a" />
+
+
+<img width="1620" height="568" alt="image" src="https://github.com/user-attachments/assets/cd9c2ab4-b3a7-4b9c-aa36-984a731cd20b" />
+
+
+<img width="1564" height="967" alt="image" src="https://github.com/user-attachments/assets/5d8a9093-bf4a-46fa-9fbf-dd2c9c9104b7" />
+
+<img width="1576" height="592" alt="image" src="https://github.com/user-attachments/assets/135694ad-ed57-4746-a2e5-9863b38cb2d4" />
+
