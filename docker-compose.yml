@@ -1,0 +1,306 @@
+version: '3.9'
+
+# =============================================================================
+#  Order Management System – Full Docker Compose Stack
+#
+#  Services:
+#   Infrastructure : postgres-user, postgres-order, postgres-payment,
+#                    postgres-notification, redis, zookeeper, kafka
+#   Application    : api-gateway, user-service, order-service,
+#                    payment-service, notification-service
+#   Monitoring     : prometheus, grafana
+# =============================================================================
+
+networks:
+  orderms-net:
+    driver: bridge
+
+volumes:
+  pg-user-data:
+  pg-order-data:
+  pg-payment-data:
+  pg-notification-data:
+  redis-data:
+  kafka-data:
+  prometheus-data:
+  grafana-data:
+
+services:
+
+  # ===========================================================================
+  # INFRASTRUCTURE
+  # ===========================================================================
+
+  postgres-user:
+    image: postgres:16-alpine
+    container_name: postgres-user
+    environment:
+      POSTGRES_DB:       user_db
+      POSTGRES_USER:     postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg-user-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d user_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [orderms-net]
+
+  postgres-order:
+    image: postgres:16-alpine
+    container_name: postgres-order
+    environment:
+      POSTGRES_DB:       order_db
+      POSTGRES_USER:     postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - pg-order-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d order_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [orderms-net]
+
+  postgres-payment:
+    image: postgres:16-alpine
+    container_name: postgres-payment
+    environment:
+      POSTGRES_DB:       payment_db
+      POSTGRES_USER:     postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - pg-payment-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d payment_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [orderms-net]
+
+  postgres-notification:
+    image: postgres:16-alpine
+    container_name: postgres-notification
+    environment:
+      POSTGRES_DB:       notification_db
+      POSTGRES_USER:     postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
+    volumes:
+      - pg-notification-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d notification_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [orderms-net]
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: redis
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks: [orderms-net]
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.1
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME:   2000
+    ports:
+      - "2181:2181"
+    networks: [orderms-net]
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "9101:9101"
+    environment:
+      KAFKA_BROKER_ID:                        1
+      KAFKA_ZOOKEEPER_CONNECT:                zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP:   PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS:             PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE:        "true"
+      KAFKA_LOG_RETENTION_HOURS:              168
+      KAFKA_JMX_PORT:                         9101
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks: [orderms-net]
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    depends_on:
+      - kafka
+    ports:
+      - "8090:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME:            local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+    networks: [orderms-net]
+
+  # ===========================================================================
+  # APPLICATION SERVICES
+  # ===========================================================================
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    container_name: api-gateway
+    depends_on:
+      redis: { condition: service_healthy }
+    ports:
+      - "8080:8080"
+    environment:
+      REDIS_HOST:                redis
+      USER_SERVICE_HOST:         user-service
+      ORDER_SERVICE_HOST:        order-service
+      PAYMENT_SERVICE_HOST:      payment-service
+      NOTIFICATION_SERVICE_HOST: notification-service
+      JWT_SECRET:                ${JWT_SECRET:-ThisIsAVeryLongSecretKeyForOrderManagementSystemAtLeast256BitsLong!}
+    networks: [orderms-net]
+    restart: unless-stopped
+
+  user-service:
+    build:
+      context: .
+      dockerfile: user-service/Dockerfile
+    container_name: user-service
+    depends_on:
+      postgres-user: { condition: service_healthy }
+      redis:         { condition: service_healthy }
+    ports:
+      - "8081:8081"
+    environment:
+      DB_HOST:     postgres-user
+      DB_NAME:     user_db
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      REDIS_HOST:  redis
+      JWT_SECRET:  ${JWT_SECRET:-ThisIsAVeryLongSecretKeyForOrderManagementSystemAtLeast256BitsLong!}
+    networks: [orderms-net]
+    restart: unless-stopped
+
+  order-service:
+    build:
+      context: .
+      dockerfile: order-service/Dockerfile
+    container_name: order-service
+    depends_on:
+      postgres-order: { condition: service_healthy }
+      kafka:          { condition: service_healthy }
+      redis:          { condition: service_healthy }
+    ports:
+      - "8082:8082"
+    environment:
+      DB_HOST:                  postgres-order
+      DB_NAME:                  order_db
+      DB_USERNAME:              postgres
+      DB_PASSWORD:              postgres
+      REDIS_HOST:               redis
+      KAFKA_BOOTSTRAP_SERVERS:  kafka:29092
+      JWT_SECRET:               ${JWT_SECRET:-ThisIsAVeryLongSecretKeyForOrderManagementSystemAtLeast256BitsLong!}
+    networks: [orderms-net]
+    restart: unless-stopped
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: payment-service/Dockerfile
+    container_name: payment-service
+    depends_on:
+      postgres-payment: { condition: service_healthy }
+      kafka:            { condition: service_healthy }
+    ports:
+      - "8083:8083"
+    environment:
+      DB_HOST:                  postgres-payment
+      DB_NAME:                  payment_db
+      DB_USERNAME:              postgres
+      DB_PASSWORD:              postgres
+      KAFKA_BOOTSTRAP_SERVERS:  kafka:29092
+      JWT_SECRET:               ${JWT_SECRET:-ThisIsAVeryLongSecretKeyForOrderManagementSystemAtLeast256BitsLong!}
+    networks: [orderms-net]
+    restart: unless-stopped
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: notification-service/Dockerfile
+    container_name: notification-service
+    depends_on:
+      postgres-notification: { condition: service_healthy }
+      kafka:                 { condition: service_healthy }
+    ports:
+      - "8084:8084"
+    environment:
+      DB_HOST:                  postgres-notification
+      DB_NAME:                  notification_db
+      DB_USERNAME:              postgres
+      DB_PASSWORD:              postgres
+      KAFKA_BOOTSTRAP_SERVERS:  kafka:29092
+    networks: [orderms-net]
+    restart: unless-stopped
+
+  # ===========================================================================
+  # MONITORING
+  # ===========================================================================
+
+  prometheus:
+    image: prom/prometheus:v2.52.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=15d'
+    networks: [orderms-net]
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:10.4.2
+    container_name: grafana
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER:     admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP:     "false"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./infra/grafana/provisioning:/etc/grafana/provisioning:ro
+    networks: [orderms-net]
+    restart: unless-stopped

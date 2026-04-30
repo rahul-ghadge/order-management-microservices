@@ -1,0 +1,66 @@
+# =============================================================
+#  .gitignore – spring-boot-order-management-microservices
+# =============================================================
+
+# ── Maven build output ────────────────────────────────────────
+target/
+**/target/
+*.class
+*.jar
+*.war
+*.ear
+
+# ── Maven wrapper ─────────────────────────────────────────────
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# ── IDE – IntelliJ IDEA ───────────────────────────────────────
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# ── IDE – Eclipse / STS ───────────────────────────────────────
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# ── IDE – VS Code ─────────────────────────────────────────────
+.vscode/
+*.code-workspace
+
+# ── OS ────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Secrets – NEVER commit ────────────────────────────────────
+.env
+.env.local
+.env.*.local
+*.p12
+*.jks
+*.keystore
+application-local.properties
+application-local.yml
+secrets.yml
+
+# ── Docker override ───────────────────────────────────────────
+docker-compose.override.yml
+
+# ── Logs ─────────────────────────────────────────────────────
+logs/
+*.log
+*.log.*
+
+# ── Test reports ─────────────────────────────────────────────
+surefire-reports/
+
+# ── Grafana provisioning secrets ─────────────────────────────
+infra/grafana/provisioning/datasources/*.json

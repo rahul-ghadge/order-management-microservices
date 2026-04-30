@@ -1,0 +1,92 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+      routes:
+
+        # ── User Service (public: auth; protected: users) ──────────────────────
+        - id: user-service-auth
+          uri: http://${USER_SERVICE_HOST:localhost}:8081
+          predicates:
+            - Path=/api/v1/auth/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 20
+                redis-rate-limiter.burstCapacity: 40
+
+        - id: user-service-users
+          uri: http://${USER_SERVICE_HOST:localhost}:8081
+          predicates:
+            - Path=/api/v1/users/**
+          filters:
+            - JwtAuthenticationFilter
+
+        # ── Order Service ──────────────────────────────────────────────────────
+        - id: order-service
+          uri: http://${ORDER_SERVICE_HOST:localhost}:8082
+          predicates:
+            - Path=/api/v1/orders/**
+          filters:
+            - JwtAuthenticationFilter
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 50
+                redis-rate-limiter.burstCapacity: 100
+
+        # ── Payment Service ────────────────────────────────────────────────────
+        - id: payment-service
+          uri: http://${PAYMENT_SERVICE_HOST:localhost}:8083
+          predicates:
+            - Path=/api/v1/payments/**
+          filters:
+            - JwtAuthenticationFilter
+
+        # ── Notification Service ───────────────────────────────────────────────
+        - id: notification-service
+          uri: http://${NOTIFICATION_SERVICE_HOST:localhost}:8084
+          predicates:
+            - Path=/api/v1/notifications/**
+          filters:
+            - JwtAuthenticationFilter
+
+jwt:
+  secret: ${JWT_SECRET:ThisIsAVeryLongSecretKeyForOrderManagementSystemAtLeast256BitsLong!}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,gateway
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+logging:
+  level:
+    com.orderms: DEBUG
+    org.springframework.cloud.gateway: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level [%logger{36}] - %msg%n"
