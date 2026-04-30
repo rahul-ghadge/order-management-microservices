@@ -9,13 +9,13 @@
 
 ```
                         ┌──────────────────────────────────────────┐
-                        │             CLIENT (Browser / Mobile)     │
+                        │             CLIENT (Browser / Mobile)    │
                         └───────────────────┬──────────────────────┘
                                             │ HTTPS
                         ┌───────────────────▼──────────────────────┐
-                        │           API GATEWAY  :8080              │
-                        │  JWT validation · Rate limiting · CORS    │
-                        │  Spring Cloud Gateway + Redis             │
+                        │           API GATEWAY  :8080             │
+                        │  JWT validation · Rate limiting · CORS   │
+                        │  Spring Cloud Gateway + Redis            │
                         └──┬──────────┬──────────┬──────────┬──────┘
                            │          │          │          │
                ┌───────────▼──┐ ┌────▼──────┐ ┌▼────────┐ ┌▼──────────────┐
@@ -31,10 +31,10 @@
                └─────────────┘ └─────┬─────┘ └───────────┘
                                      │
                         ┌────────────▼───────────────────┐
-                        │         Apache Kafka            │
-                        │  order.placed                   │
-                        │  payment.processed              │
-                        │  order.status.changed           │
+                        │         Apache Kafka           │
+                        │  order.placed                  │
+                        │  payment.processed             │
+                        │  order.status.changed          │
                         └────────────────────────────────┘
 
                         ┌──────────────┐   ┌─────────────┐
@@ -110,7 +110,7 @@ order-service  ──[order.placed]───────────────
                                                          │  Simulates payment (85% success)
                                                          │
                                           ┌──────────────▼──────────────────┐
-                                          │      [payment.processed]         │
+                                          │      [payment.processed]        │
                                           └──────────┬──────────────────────┘
                                                      │
                               ┌──────────────────────┼────────────────────────┐
@@ -229,11 +229,11 @@ docker-compose up -d prometheus grafana
 curl -X POST http://localhost:8080/api/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{
-    "username":  "johndoe",
-    "email":     "john@example.com",
-    "password":  "Password1",
-    "firstName": "John",
-    "lastName":  "Doe"
+    "username":  "rahulghadage",
+    "email":     "rahul@example.com",
+    "password":  "stringP@ssw0rd",
+    "firstName": "Rahul",
+    "lastName":  "ghadage"
   }'
 
 # Login
@@ -256,7 +256,7 @@ curl -X POST http://localhost:8080/api/v1/orders \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "userEmail":       "john@example.com",
+    "userEmail":       "rahul@example.com",
     "shippingAddress": "123 Main Street, New York, NY 10001",
     "currency":        "USD",
     "items": [
@@ -395,26 +395,6 @@ mvn test jacoco:report
 | Idempotency | JTI-based blacklist + orderId guard in payment | Prevents double-processing on consumer retry |
 | Secret management | Environment variables | 12-Factor App compliance; Kubernetes-compatible |
 
----
-
-[//]: # (## 📮 Push to GitHub)
-
-[//]: # ()
-[//]: # (```bash)
-
-[//]: # (git init)
-
-[//]: # (git add .)
-
-[//]: # (git commit -m "feat: initial commit – Order Management System microservices")
-
-[//]: # (git remote add origin https://github.com/rahul-ghadge/spring-boot-order-management-microservices.git)
-
-[//]: # (git branch -M main)
-
-[//]: # (git push -u origin main)
-
-[//]: # (```)
 
 ---
 
