@@ -413,8 +413,7 @@ Apache 2.0 — see [LICENSE](LICENSE).
 
 
 ## 🚀 One-command startup
-Run the script below (which is mentioned [here](#-one-command-startup---just-run-one-command-and-all-sevices-will-be-up-and-running-can-be-verified-on-docker-desktop))
-Run the script below, this will bring all the services up), this will bring all the services up
+Run the script below (which is mentioned [here](#-one-command-startup---just-run-one-command-and-all-sevices-will-be-up-and-running-can-be-verified-on-docker-desktop)) from the command line
 
 ```bash
 ./scripts/start-dev.sh
