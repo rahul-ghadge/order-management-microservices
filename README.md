@@ -3,6 +3,10 @@
 > Demonstrating production-ready microservices
 > with event-driven communication, distributed security, observability, and containerization.
 
+> ### This is high level Architectural documentation.  
+> ### To deep dive into more technical stuff for these micro-services, [Detailed technical guide](https://github.com/rahul-ghadge/order-management-microservices/blob/main/DETAILED_TECHNICAL_GUIDE.md) is also present
+
+
 ---
 
 ## 📐 Architecture Overview
