@@ -49,6 +49,12 @@
 
 ---
 
+<img width="7042" height="10557" alt="diagram (2)" src="https://github.com/user-attachments/assets/c3f84453-b2dd-4c21-8bf0-77df301f4e39" />
+
+
+
+---
+
 ## ✨ Key Features
 
 | Category | Feature |
